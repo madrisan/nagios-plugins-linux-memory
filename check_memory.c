@@ -369,8 +369,8 @@ main (int argc, char **argv)
 
   if (show_memory)
     {
-      printf ("%s %.2f%% (%Lu kB) used | "
-              "mem_total=%Lu, mem_used=%Lu, mem_free=%Lu, mem_shared=%Lu, mem_buffers=%Lu, mem_cached=%Lu\n",
+      printf ("%s %.2f%% (%lu kB) used | "
+              "mem_total=%lu, mem_used=%lu, mem_free=%lu, mem_shared=%lu, mem_buffers=%lu, mem_cached=%lu\n",
               result_line, perc, kb_main_used,
               S (kb_main_total), S (kb_main_used), S (kb_main_free), S (kb_main_shared),
               S (kb_main_buffers), S (kb_main_cached));
@@ -378,7 +378,7 @@ main (int argc, char **argv)
   else
     {
       printf
-        ("%s %.2f%% (%Lu kB) used | swap_total=%Lu, swap_used=%Lu, swap_free=%Lu\n",
+        ("%s %.2f%% (%lu kB) used | swap_total=%lu, swap_used=%lu, swap_free=%lu\n",
          result_line, perc, kb_swap_used, S (kb_swap_total), S (kb_swap_used),
          S (kb_swap_free));
     }
