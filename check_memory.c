@@ -70,10 +70,6 @@ There is NO WARRANTY, to the extent permitted by law.\n", stdout);
   exit (STATE_OK);
 }
 
-#define BAD_OPEN_MESSAGE \
-"Error: /proc must be mounted\n"
-
-#define MEMINFO_FILE "/proc/meminfo"
 static int meminfo_fd = -1;
 
 /* As of 2.6.24 /proc/meminfo seems to need 888 on 64-bit,
@@ -88,7 +84,7 @@ static char buf[2048];
 #define FILE_TO_BUF(filename, fd) do{                           \
     static int local_n;                                         \
     if (fd == -1 && (fd = open(filename, O_RDONLY)) == -1) {    \
-        fputs(BAD_OPEN_MESSAGE, stdout);                        \
+        fputs("Error: /proc must be mounted\n", stdout);        \
         fflush(NULL);                                           \
         exit(STATE_UNKNOWN);                                    \
     }                                                           \
@@ -233,7 +229,7 @@ meminfo (void)
   };
   const int mem_table_count = sizeof (mem_table) / sizeof (mem_table_struct);
 
-  FILE_TO_BUF (MEMINFO_FILE, meminfo_fd);
+  FILE_TO_BUF ("/proc/meminfo", meminfo_fd);
 
   kb_inactive = ~0UL;
 
