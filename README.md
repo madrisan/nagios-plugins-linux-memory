@@ -11,19 +11,16 @@ Usage
 
 Where
 
-* start <= end
-* start and ":" is not required if start=0
-* if range is of format "start:" and end is not specified, assume end is infinity
-* to specify negative infinity, use "~"
-* alert is raised if metric is outside start and end range (inclusive of endpoints)
-* if range starts with "@", then alert if inside this range (inclusive of endpoints)
+* -M, --memory   show the memory usage
+* -S, --swap   show the swap usage
+* -b,-k,-m,-g   show output in bytes, KB (the default), MB, or GB
+* -w, --warning PERCENT   warning threshold
+* -c, --critical PERCENT   critical threshold
 
 Examples
 
-	# check memory usage
-	check_memory -w 80 -c 90 -M -k
-	# check swap usage
-	check_memory -w 80 -c 90 -S -k
+	check_memory --memory -w 80% -c 90%
+	check_memory --swap -w 80% -c 90% -b
 
 
 ## Source code
