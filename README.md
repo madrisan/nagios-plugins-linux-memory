@@ -11,11 +11,11 @@ Usage
 
 Where
 
-* -M, --memory   show the memory usage
-* -S, --swap   show the swap usage
-* -b,-k,-m,-g   show output in bytes, KB (the default), MB, or GB
-* -w, --warning PERCENT   warning threshold
-* -c, --critical PERCENT   critical threshold
+* -M, --memory: show the memory usage
+* -S, --swap: show the swap usage
+* -b,-k,-m,-g: show output in bytes, KB (the default), MB, or GB
+* -w, --warning PERCENT: warning threshold
+* -c, --critical PERCENT: critical threshold
 
 Examples
 
