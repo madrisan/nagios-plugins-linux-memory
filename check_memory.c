@@ -2,7 +2,7 @@
  * License: GPLv2
  * Copyright (c) 2014 Davide Madrisan <davide.madrisan@gmail.com>
  *
- * A Nagios plugin to check memory or swap usage on linux
+ * A Nagios plugin to check memory and swap usage on linux
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,21 +39,28 @@ static const char *program_copyright =
 static void __attribute__ ((__noreturn__)) usage (FILE * out)
 {
   fprintf (out,
-           "%s, version %s - check memory or swap usage.\n",
+           "%s, version %s - check memory and swap usage.\n",
            program_name, program_version);
   fprintf (out, "%s\n\n", program_copyright);
-  fprintf (out, "Usage: %s {-M|-S} [-b,-k,-m,-g] -w PERC -c PERC\n", program_name);
+  fprintf (out,
+           "Usage: %s {-M|-S} [-C] [-b,-k,-m,-g] -w PERC -c PERC\n",
+           program_name);
   fprintf (out, "       %s -h\n", program_name);
   fprintf (out, "       %s -V\n\n", program_name);
   fputs ("\
 Options:\n\
-  -M, --memory   show the memory usage\n\
-  -S, --swap     show the swap usage\n\
-  -b,-k,-m,-g    show output in bytes, KB (the default), MB, or GB\n\
+  -M, --memory     show the memory usage\n\
+  -S, --swap       show the swap usage\n\
+  -b,-k,-m,-g      show output in bytes, KB (the default), MB, or GB\n\
+  -C, --caches     count buffers and cached memory as free memory\n\
   -w, --warning PERCENT   warning threshold\n\
   -c, --critical PERCENT   critical threshold\n\
-  -h, --help            display this help and exit\n\
-  -v, --version         output version information and exit\n\n", out);
+  -h, --help       display this help and exit\n\
+  -v, --version    output version information and exit\n\n", out);
+  fprintf (out, "\
+Examples:\n\
+  %s --memory -C -w 80%% -c90%%\n", program_name);
+  fprintf (out, "  %s --swap -w 30%% -c 50%%\n\n", program_name);
 
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
@@ -280,6 +287,7 @@ meminfo (void)
 static struct option const longopts[] = {
   {(char *) "memory", no_argument, NULL, 'M'},
   {(char *) "swap", no_argument, NULL, 'S'},
+  {(char *) "caches", no_argument, NULL, 'C'},
   {(char *) "critical", required_argument, NULL, 'c'},
   {(char *) "warning", required_argument, NULL, 'w'},
   {(char *) "byte", no_argument, NULL, 'b'},
@@ -298,14 +306,14 @@ int
 main (int argc, char **argv)
 {
   int c, status;
-  int show_memory = 0, show_swap = 0;
+  int show_memory = 0, show_swap = 0, cache_is_free = 0;
   int shift = 10; /* output in kilobytes by default */
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
   thresholds *my_threshold = NULL;
   float perc;
 
-  while ((c = getopt_long (argc, argv, "MSc:w:bkmghV", longopts, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "MSCc:w:bkmghV", longopts, NULL)) != -1)
     {
       switch (c)
         {
@@ -317,6 +325,9 @@ main (int argc, char **argv)
           break;
         case 'S':
           show_swap = 1;
+          break;
+        case 'C':
+          cache_is_free = 1;
           break;
         case 'c':
           critical = optarg;
@@ -352,6 +363,12 @@ main (int argc, char **argv)
     }
 
   meminfo ();
+
+  if (cache_is_free)
+    {
+      kb_main_used -= kb_main_cached;
+      kb_main_free += kb_main_cached;
+    }
 
   perc = show_memory ?
     (kb_main_used * 100.0 / kb_main_total) : (kb_swap_used * 100.0 / kb_swap_total);
