@@ -275,7 +275,7 @@ meminfo (void)
   kb_main_used = kb_main_total - kb_main_free;
 }
 
-#define S(X) ( ((unsigned long long)(X) << 10) >> shift)
+#define SU(X) ( ((unsigned long long)(X) << 10) >> shift), units
 
 static struct option const longopts[] = {
   {(char *) "memory", no_argument, NULL, 'M'},
@@ -301,6 +301,7 @@ main (int argc, char **argv)
   int show_memory = 0, show_swap = 0;
   int shift = 10; /* output in kilobytes by default */
   char *critical = NULL, *warning = NULL;
+  char *units = NULL;
   thresholds *my_threshold = NULL;
   float perc;
 
@@ -329,10 +330,10 @@ main (int argc, char **argv)
         case 'V':
           print_version ();
           break;
-        case 'b': shift = 0;  break;
-        case 'k': shift = 10; break;
-        case 'm': shift = 20; break;
-        case 'g': shift = 30; break;
+        case 'b': shift = 0;  units = strdup ("B"); break;
+        case 'k': shift = 10; units = strdup ("kB"); break;
+        case 'm': shift = 20; units = strdup ("MB"); break;
+        case 'g': shift = 30; units = strdup ("GB"); break;
         }
     }
 
@@ -342,7 +343,14 @@ main (int argc, char **argv)
   status = set_thresholds (&my_threshold, warning, critical);
   if (status == NP_RANGE_UNPARSEABLE)
     usage (stderr);
-  
+
+  /* output in kilobytes by default */
+  if (units == NULL)
+    {
+      units = strdup ("kB");
+      shift = 10;
+    }
+
   meminfo ();
 
   perc = show_memory ?
@@ -365,19 +373,30 @@ main (int argc, char **argv)
 
   if (show_memory)
     {
-      printf ("%s %.2f%% (%lu kB) used | "
-              "mem_total=%lu, mem_used=%lu, mem_free=%lu, mem_shared=%lu, mem_buffers=%lu, mem_cached=%lu\n",
-              result_line, perc, kb_main_used,
-              S (kb_main_total), S (kb_main_used), S (kb_main_free), S (kb_main_shared),
-              S (kb_main_buffers), S (kb_main_cached));
+      printf ("%s %.2f%% (%Lu %s) used | "
+              "mem_total=%Lu%s, mem_used=%Lu%s, mem_free=%Lu%s, "
+              "mem_shared=%Lu%s, mem_buffers=%Lu%s, mem_cached=%Lu%s\n",
+              result_line, perc, SU (kb_main_used),
+              SU (kb_main_total),
+              SU (kb_main_used),
+              SU (kb_main_free),
+              SU (kb_main_shared),
+              SU (kb_main_buffers),
+              SU (kb_main_cached)
+      );
     }
   else
     {
       printf
-        ("%s %.2f%% (%lu kB) used | swap_total=%lu, swap_used=%lu, swap_free=%lu\n",
-         result_line, perc, kb_swap_used, S (kb_swap_total), S (kb_swap_used),
-         S (kb_swap_free));
+        ("%s %.2f%% (%Lu %s) used | "
+         "swap_total=%Lu%s, swap_used=%Lu%s, swap_free=%Lu%s\n",
+         result_line, perc, SU (kb_swap_used),
+         SU (kb_swap_total),
+         SU (kb_swap_used),
+         SU (kb_swap_free)
+      );
     }
+  free (units);
 
   return status;
 }
