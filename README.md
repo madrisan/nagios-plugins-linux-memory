@@ -12,15 +12,16 @@ Usage
 Where
 
 * -M, --memory: show the memory usage
-* -S, --swap: show the swap usage
+* -S, --swap: show the swap usagea
+* -C, --caches: count buffers and cached memory as free memory
 * -b,-k,-m,-g: show output in bytes, KB (the default), MB, or GB
 * -w, --warning PERCENT: warning threshold
 * -c, --critical PERCENT: critical threshold
 
 Examples
 
-	check_memory --memory -w 80% -c 90%
-	check_memory --swap -w 80% -c 90% -b
+	check_memory --memory -C -w 80% -c 90%
+	check_memory --swap -w 40% -c 60% -m
 
 
 ## Source code
