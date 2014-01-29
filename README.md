@@ -4,8 +4,8 @@ A nagios plugin to check memory and swap usage on linux.
 
 Usage
 
-	check_memory [-w [@]start:end] [-c [@]start:end] -M [-b,-k,-m,-g]
-	check_memory [-w [@]start:end] [-c [@]start:end] -S [-b,-k,-m,-g]
+	check_memory --memory [-C] [-b,-k,-m,-g] [-w PERC] [-c PERC]
+	check_memory --swap [-b,-k,-m,-g] [-w PERC] [-c PERC]
 	check_memory --help
 	check_memory --version
 
