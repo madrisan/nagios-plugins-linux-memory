@@ -366,8 +366,8 @@ main (int argc, char **argv)
 
   if (cache_is_free)
     {
-      kb_main_used -= kb_main_cached;
-      kb_main_free += kb_main_cached;
+      kb_main_used -= (kb_main_cached + kb_main_buffers);
+      kb_main_free += (kb_main_cached + kb_main_buffers);
     }
 
   perc = show_memory ?
