@@ -307,7 +307,7 @@ main (int argc, char **argv)
 {
   int c, status;
   int show_memory = 0, show_swap = 0, cache_is_free = 0;
-  int shift = 10; /* output in kilobytes by default */
+  int shift;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
   thresholds *my_threshold = NULL;
