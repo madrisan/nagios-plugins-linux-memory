@@ -299,9 +299,6 @@ static struct option const longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-#define BUFSIZE 127
-static char result_line[BUFSIZE + 1];
-
 int
 main (int argc, char **argv)
 {
@@ -310,6 +307,7 @@ main (int argc, char **argv)
   int shift;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
+  char statusbuf[10];                 /* big enough to hold the plugin status */
   thresholds *my_threshold = NULL;
   float perc;
 
@@ -377,13 +375,13 @@ main (int argc, char **argv)
   switch (status)
     {
     case STATE_CRITICAL:
-      c = snprintf (result_line, BUFSIZE, "CRITICAL:");
+      c = sprintf (statusbuf, "CRITICAL:");
       break;
     case STATE_WARNING:
-      c = snprintf (result_line, BUFSIZE, "WARNING:");
+      c = sprintf (statusbuf, "WARNING:");
       break;
     case STATE_OK:
-      c = snprintf (result_line, BUFSIZE, "OK:");
+      c = sprintf (statusbuf, "OK:");
       break;
     }
   free (my_threshold);
@@ -393,7 +391,7 @@ main (int argc, char **argv)
       printf ("%s %.2f%% (%Lu %s) used | "
               "mem_total=%Lu%s, mem_used=%Lu%s, mem_free=%Lu%s, "
               "mem_shared=%Lu%s, mem_buffers=%Lu%s, mem_cached=%Lu%s\n",
-              result_line, perc, SU (kb_main_used),
+              statusbuf, perc, SU (kb_main_used),
               SU (kb_main_total),
               SU (kb_main_used),
               SU (kb_main_free),
@@ -407,7 +405,7 @@ main (int argc, char **argv)
       printf
         ("%s %.2f%% (%Lu %s) used | "
          "swap_total=%Lu%s, swap_used=%Lu%s, swap_free=%Lu%s\n",
-         result_line, perc, SU (kb_swap_used),
+         statusbuf, perc, SU (kb_swap_used),
          SU (kb_swap_total),
          SU (kb_swap_used),
          SU (kb_swap_free)
