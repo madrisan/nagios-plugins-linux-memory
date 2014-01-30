@@ -53,10 +53,11 @@ you're done!
 This package is written in plain C, making as few assumptions as possible, and
 sticking closely to ANSI C/POSIX.
 
-This is a list of platforms this nagios plugin is known to compile and run on
+This is a list of Linux distributions this nagios plugin is known to compile
+and run on
 
-* Linux with kernel 3.10 and glibc 2.18 (openmamba milestone 2.90.0)
-
+* Linux with kernel 3.10 and glibc 2.18 - openmamba milestone 2.90.0
+* Linux with kernel 2.6.32 and glibc 2.12 - RHEL 6.4 (Santiago)
 
 ## Bugs
 
