@@ -124,7 +124,5 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_PROTOTYPES
 
-AC_SUBST(host_os_api)
-
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
