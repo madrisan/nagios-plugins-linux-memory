@@ -47,6 +47,7 @@ case "$host" in
     [Define to 1 if the os has the memory shared counter.])
   AC_DEFINE([HAVE_MEMORY_BUFFERS], [1],
     [Define to 1 if the os has the memory buffers counter.])
+  MEMINFO_MODULE='meminfo-linux.$(OBJEXT)'
   ;;
 *-*-openbsd*)
   AC_MSG_CHECKING(for function sysctl (VM_METER))
@@ -109,17 +110,21 @@ AC_MSG_RESULT([$ac_cv_function_sysctl_vfs_bcachestat])
       AC_DEFINE([HAVE_OPENBSD_SYSCTL], [1],
        [Define to 1 if you have all the required OpenBSD sysctl calls.])
   fi
+  MEMINFO_MODULE='meminfo-openbsd.$(OBJEXT)'
   ;;
 *)
   AC_MSG_ERROR("This Platform is not (yet) supported.")
   ;;
 esac
+AC_SUBST([MEMINFO_MODULE])
 
 AC_PREFIX_DEFAULT(/usr/local/nagios)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_PROTOTYPES
+
+AC_SUBST(host_os_api)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
