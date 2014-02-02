@@ -66,5 +66,5 @@ Thanks to grex.org for providing a free OpenBSD shell account.
 ## Bugs
 
 If you find a bug please create an issue in the project bug tracker at
-https://github.com/madrisan/nagios-plugins-linux-memory/issues
+https://github.com/madrisan/nagios-plugins-memory/issues
 
