@@ -34,7 +34,7 @@ The source code can be also found at https://sites.google.com/site/davidemadrisa
 This package uses GNU autotools for configuration and installation.
 
 If you have cloned the git repository then you will need to run
-`autogen.sh` to generate the required files.
+`autoreconf --install` to generate the required files.
 
 Run `./configure --help` to see a list of available install options.
 The plugin will be installed by default into `LIBEXECDIR`.
