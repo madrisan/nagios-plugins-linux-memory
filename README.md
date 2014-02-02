@@ -56,8 +56,12 @@ sticking closely to ANSI C/POSIX.
 This is a list of Linux distributions this nagios plugin is known to compile
 and run on
 
-* Linux with kernel 3.10 and glibc 2.18 - openmamba milestone 2.90.0
-* Linux with kernel 2.6.32 and glibc 2.12 - RHEL 6.4 (Santiago)
+* Linux with kernel 3.10 (openmamba milestone 2.90.0)
+* Linux with kernel 2.6.32 (RHEL 6.X (Santiago))
+* Linux with kernel 2.6.18 (RHEL 5.X (Tikanga))
+* OpenBSD 5.0
+
+Thanks to grex.org for providing a free OpenBSD shell account.
 
 ## Bugs
 

@@ -22,6 +22,99 @@ AC_PROG_GCC_TRADITIONAL
 dnl Checks for header files
 AC_HEADER_STDC
 
+AC_CHECK_HEADERS([sys/param.h])
+# check sys/sysctl.h separately, as it requires other header
+# on at least OpenBSD 
+AC_CHECK_HEADERS([sys/sysctl.h], [], [],
+[[#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+]])
+
+AC_CHECK_HEADERS([sys/mount.h], [], [],
+[[#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+]])
+
+dnl Check for some target-specific stuff
+case "$host" in
+
+*-*-linux*)
+  AC_DEFINE([HAVE_PROC_MEMINFO], [1],
+    [Define to 1 if you have /proc/meminfo.])
+  AC_DEFINE([HAVE_MEMORY_SHARED], [1],
+    [Define to 1 if the os has the memory shared counter.])
+  AC_DEFINE([HAVE_MEMORY_BUFFERS], [1],
+    [Define to 1 if the os has the memory buffers counter.])
+  ;;
+*-*-openbsd*)
+  AC_MSG_CHECKING(for function sysctl (VM_METER))
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+ 
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */
+ 
+#include <sys/sysctl.h>
+#include <unistd.h>
+     ]],[[
+int vmtotal_mib[] = {CTL_VM, VM_METER};
+struct vmtotal vmtotal;
+size_t size;
+
+size = sizeof(vmtotal);
+sysctl(vmtotal_mib, 2, &vmtotal, &size, NULL, 0);]])],
+    [ac_cv_function_sysctl_vm_meter=yes
+     AC_DEFINE_UNQUOTED(HAVE_FUNCTION_SYSCTL_VM_METER, 1,
+       [Define to 1 if 'VM_METER' exists.])
+    ],
+    [ac_cv_function_sysctl_vm_meter=no])
+  AC_MSG_RESULT([$ac_cv_function_sysctl_vm_meter])
+
+  AC_MSG_CHECKING(for function sysctl (VFS_BCACHESTAT))
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */
+
+#include <sys/mount.h>
+#include <sys/sysctl.h>
+#include <unistd.h>
+     ]],[[
+int bcstats_mib[] = {CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT};
+struct bcachestats bcstats;
+size_t size;
+
+size = sizeof(bcstats);
+sysctl(bcstats_mib, 3, &bcstats, &size, NULL, 0);]])],
+    [ac_cv_function_sysctl_vfs_bcachestat=yes
+     AC_DEFINE_UNQUOTED(HAVE_FUNCTION_SYSCTL_VFS_BCACHESTAT, 1,
+       [Define to 1 if 'VFS_BCACHESTAT' exists.])
+    ],
+    [ac_cv_function_sysctl_vfs_bcachestat=no])
+AC_MSG_RESULT([$ac_cv_function_sysctl_vfs_bcachestat])
+
+  if test x$ac_cv_function_sysctl_vm_meter = xyes && \
+    test x$ac_cv_function_sysctl_vfs_bcachestat = xyes; then
+      AC_DEFINE([HAVE_OPENBSD_SYSCTL], [1],
+       [Define to 1 if you have all the required OpenBSD sysctl calls.])
+  fi
+  ;;
+*)
+  AC_MSG_ERROR("This Platform is not (yet) supported.")
+  ;;
+esac
+
 AC_PREFIX_DEFAULT(/usr/local/nagios)
 
 dnl Checks for typedefs, structures, and compiler characteristics.

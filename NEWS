@@ -1,3 +1,10 @@
+    Major changes betwhhn "nagios-plugins-memory" version 1 and 2
+
+* A new architecture is supported: OpenBSD (tested on v5.0).
+* The plugin has been renamed by removing the '-linux' string.
+
+======================================================================
+
     Major changes in "nagios-plugins-linux-memory" version 1
 
 * First release.

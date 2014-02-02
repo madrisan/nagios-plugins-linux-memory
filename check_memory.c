@@ -22,6 +22,15 @@
 
 #include "config.h"
 
+#if HAVE_OPENBSD_SYSCTL
+# include <sys/param.h>
+# include <sys/types.h>
+# include <sys/mount.h>
+# include <sys/sysctl.h>
+# include <sys/swap.h>
+# include <unistd.h>    /* getpagesize */
+#endif
+
 #include <fcntl.h>
 #include <getopt.h>
 #include <stddef.h>
@@ -77,6 +86,7 @@ There is NO WARRANTY, to the extent permitted by law.\n", stdout);
   exit (STATE_OK);
 }
 
+#if HAVE_PROC_MEMINFO
 static int meminfo_fd = -1;
 
 /* As of 2.6.24 /proc/meminfo seems to need 888 on 64-bit,
@@ -103,6 +113,8 @@ static char buf[2048];
     }                                                           \
     buf[local_n] = '\0';                                        \
 }while(0)
+
+#define SU(X) ( ((unsigned long long)(X) << 10) >> shift), units
 
 /* example data, following junk, with comments added:
  *
@@ -281,8 +293,137 @@ meminfo (void)
   kb_swap_used = kb_swap_total - kb_swap_free;
   kb_main_used = kb_main_total - kb_main_free;
 }
+#endif   /* HAVE_PROC_MEMINFO */
 
-#define SU(X) ( ((unsigned long long)(X) << 10) >> shift), units
+
+#if HAVE_OPENBSD_SYSCTL
+# define NUM_AVERAGES    3
+  /* Log base 2 of 1024 is 10 (2^10 == 1024) */
+# define LOG1024         10
+
+/* these are for getting the memory statistics */
+static int      pageshift;      /* log base 2 of the pagesize */
+
+/* define pagetok in terms of pageshift */
+#define pagetok(size) ((size) << pageshift)
+
+#define SU(X) ( ((unsigned int)(X) << 10) >> shift), units
+
+static int kb_main_used;
+static int kb_main_cached;
+static int kb_main_free;
+static int kb_main_total;
+static int kb_swap_used;
+static int kb_swap_free;
+static int kb_swap_total;
+
+int
+get_system_pagesize()
+{
+  int pagesize;
+
+  /*
+   * get the page size with "getpagesize" and calculate pageshift from
+   * it
+   * fixme: we should use sysconf(_SC_PAGESIZE) instead
+   */
+  pagesize = getpagesize ();
+  pageshift = 0;
+  while (pagesize > 1)
+    {
+      pageshift++;
+      pagesize >>= 1;
+    }
+
+  /* we only need the amount of log(2)1024 for our conversion */
+  pageshift -= LOG1024;
+
+  return (0);
+}
+
+int
+swapmode (int *used, int *total)
+{
+  struct swapent *swdev;
+  int nswap, rnswap, i;
+
+  nswap = swapctl (SWAP_NSWAP, 0, 0);
+  if (nswap == 0)
+    return 0;
+
+  swdev = calloc (nswap, sizeof (*swdev));
+  if (swdev == NULL)
+    return 0;
+
+  rnswap = swapctl (SWAP_STATS, swdev, nswap);
+  if (rnswap == -1)
+    {
+      free (swdev);
+      return 0;
+    }
+
+  /* if rnswap != nswap, then what? */
+
+  /* Total things up */
+  *total = *used = 0;
+  for (i = 0; i < nswap; i++)
+    {
+      if (swdev[i].se_flags & SWF_ENABLE)
+        {
+          *used += (swdev[i].se_inuse / (1024 / DEV_BSIZE));
+          *total += (swdev[i].se_nblks / (1024 / DEV_BSIZE));
+        }
+    }
+  free (swdev);
+  return 1;
+}
+
+void
+meminfo (void)
+{
+  static int vmtotal_mib[] = { CTL_VM, VM_METER };
+  static int bcstats_mib[] = { CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT };
+  struct vmtotal vmtotal;
+  struct bcachestats bcstats;
+  size_t size;
+
+  if (get_system_pagesize() == -1)
+    { 
+      fputs("RUNTIME ERROR: get_system_pagesize failed\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  /* get total -- systemwide main memory usage structure */
+  size = sizeof (vmtotal);
+  if (sysctl (vmtotal_mib, 2, &vmtotal, &size, NULL, 0) < 0)
+    { 
+      bzero (&vmtotal, sizeof (vmtotal));
+      fputs("RUNTIME ERROR: sysctl failed\n", stdout);
+      exit(STATE_UNKNOWN);
+    } 
+  size = sizeof (bcstats);
+  if (sysctl (bcstats_mib, 3, &bcstats, &size, NULL, 0) < 0)
+    { 
+      fputs("RUNTIME ERROR: sysctl failed\n", stdout);
+      bzero (&bcstats, sizeof (bcstats));
+      exit(STATE_UNKNOWN);
+    } 
+
+  /* convert memory stats to Kbytes */
+  kb_main_total = pagetok (vmtotal.t_rm);
+  kb_main_used = pagetok (vmtotal.t_arm);
+  kb_main_free = pagetok (vmtotal.t_free);;
+  kb_main_cached = pagetok (bcstats.numbufpages);
+
+  if (!swapmode (&kb_swap_used, &kb_swap_total))
+    {
+      kb_swap_total = 0;
+      kb_swap_used = 0;
+    }
+  kb_swap_free = kb_swap_total - kb_swap_used;
+}
+#endif   /* HAVE_OPENBSD_SYSCTL */
+
 
 static struct option const longopts[] = {
   {(char *) "memory", no_argument, NULL, 'M'},
@@ -364,8 +505,13 @@ main (int argc, char **argv)
 
   if (cache_is_free)
     {
+#if HAVE_MEMORY_BUFFERS
       kb_main_used -= (kb_main_cached + kb_main_buffers);
       kb_main_free += (kb_main_cached + kb_main_buffers);
+#else
+      kb_main_used -= kb_main_cached;
+      kb_main_free += kb_main_cached;
+#endif
     }
 
   perc = show_memory ?
@@ -390,13 +536,23 @@ main (int argc, char **argv)
     {
       printf ("%s %.2f%% (%Lu %s) used | "
               "mem_total=%Lu%s, mem_used=%Lu%s, mem_free=%Lu%s, "
-              "mem_shared=%Lu%s, mem_buffers=%Lu%s, mem_cached=%Lu%s\n",
+#if HAVE_MEMORY_SHARED
+              "mem_shared=%Lu%s, "
+#endif
+#if HAVE_MEMORY_BUFFERS
+              "mem_buffers=%Lu%s, "
+#endif
+              "mem_cached=%Lu%s\n",
               statusbuf, perc, SU (kb_main_used),
               SU (kb_main_total),
               SU (kb_main_used),
               SU (kb_main_free),
+#if HAVE_MEMORY_SHARED
               SU (kb_main_shared),
+#endif
+#if HAVE_MEMORY_BUFFERS
               SU (kb_main_buffers),
+#endif
               SU (kb_main_cached)
       );
     }
