@@ -124,5 +124,39 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_PROTOTYPES
 
+dnl cc_TRY_CFLAGS (CFLAGS, [ACTION-IF-WORKS], [ACTION-IF-FAILS])
+dnl ------------------------------------------------------------
+dnl Checks if $CC supports a given set of CFLAGS.
+dnl If supported, the current CFLAGS is appended to SUPPORTED_CFLAGS
+AC_DEFUN([cc_TRY_CFLAGS],
+   [AC_MSG_CHECKING([whether compiler accepts $1])
+   ac_save_CFLAGS="$CFLAGS"
+   CFLAGS="$CFLAGS $1"
+   AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+      int x;])],
+      [ac_cv_try_cflags_ok=yes
+       SUPPORTED_CFLAGS="$SUPPORTED_CFLAGS $1"],
+      [ac_cv_try_cflags_ok=no])
+   CFLAGS="$ac_save_CFLAGS"
+   AC_MSG_RESULT([$ac_cv_try_cflags_ok])
+   if test x"$ac_cv_try_cflags_ok" = x"yes"; then
+      ifelse([$2],[],[:],[$2])
+   else
+      ifelse([$3],[],[:],[$3])
+   fi
+])  dnl end of cc_TRY_CFLAGS
+
+cc_TRY_CFLAGS([-Wall])
+cc_TRY_CFLAGS([-Wformat])
+cc_TRY_CFLAGS([-Wmissing-declarations])
+cc_TRY_CFLAGS([-Wmissing-prototypes])
+cc_TRY_CFLAGS([-Wmissing-noreturn])
+cc_TRY_CFLAGS([-Wmissing-format-attribute])
+cc_TRY_CFLAGS([-Wunreachable-code])
+cc_TRY_CFLAGS([-Wshadow])
+cc_TRY_CFLAGS([-Wunused])
+
+AC_SUBST([CFLAGS], ["$SUPPORTED_CFLAGS $CFLAGS"])
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
