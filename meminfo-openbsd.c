@@ -22,21 +22,21 @@
 
 #include "config.h"
 
-# include <sys/param.h>
-# include <sys/types.h>
-# include <sys/mount.h>
-# include <sys/sysctl.h>
-# include <sys/swap.h>
-# include <unistd.h>    /* getpagesize */
-
-#include <fcntl.h>
-#include <getopt.h>
-#include <stddef.h>
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/mount.h>
+#include <sys/sysctl.h>
+#include <sys/swap.h>
+#include <unistd.h>    /* getpagesize */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "nputils.h"
+
+int get_system_pagesize (void);
+int swapmode (int *, int *);
+void meminfo (void);
 
 # define NUM_AVERAGES    3
   /* Log base 2 of 1024 is 10 (2^10 == 1024) */
@@ -59,7 +59,7 @@ int kb_swap_free;
 int kb_swap_total;
 
 int
-get_system_pagesize()
+get_system_pagesize (void)
 {
   int pagesize;
 
