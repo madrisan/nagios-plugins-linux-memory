@@ -144,8 +144,11 @@ typedef struct mem_table_struct {
   unsigned long *slot; /* slot in return struct */
 } mem_table_struct;
 
-static int compare_mem_table_structs(const void *a, const void *b){
-  return strcmp(((const mem_table_struct*)a)->name, ((const mem_table_struct*)b)->name);
+static int
+compare_mem_table_structs (const void *a, const void *b)
+{
+  return strcmp (((const mem_table_struct*)a)->name,
+                 ((const mem_table_struct*)b)->name);
 }
 
 void
