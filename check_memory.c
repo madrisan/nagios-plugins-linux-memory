@@ -22,9 +22,7 @@
 
 #include "config.h"
 
-#include <fcntl.h>
 #include <getopt.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,7 +96,7 @@ main (int argc, char **argv)
 {
   int c, status;
   int show_memory = 0, show_swap = 0, cache_is_free = 0;
-  int shift;
+  int shift = 10;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
   char statusbuf[10];                 /* big enough to hold the plugin status */
@@ -149,10 +147,7 @@ main (int argc, char **argv)
 
   /* output in kilobytes by default */
   if (units == NULL)
-    {
-      units = strdup ("kB");
-      shift = 10;
-    }
+    units = strdup ("kB");
 
   meminfo ();
 
