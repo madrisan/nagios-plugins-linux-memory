@@ -48,8 +48,6 @@ static int      pageshift;      /* log base 2 of the pagesize */
 /* define pagetok in terms of pageshift */
 #define pagetok(size) ((size) << pageshift)
 
-#define SU(X) ( ((unsigned int)(X) << 10) >> shift), units
-
 int kb_main_used;
 int kb_main_cached;
 int kb_main_free;

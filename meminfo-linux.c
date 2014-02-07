@@ -60,8 +60,6 @@ static char buf[2048];
     buf[local_n] = '\0';                                        \
 }while(0)
 
-#define SU(X) ( ((unsigned long long)(X) << 10) >> shift), units
-
 /* example data, following junk, with comments added:
  *
  * MemTotal:        61768 kB    old

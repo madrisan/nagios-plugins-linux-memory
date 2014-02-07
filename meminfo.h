@@ -5,12 +5,14 @@
 #if HAVE_PROC_MEMINFO
 # define MEM_DATATYPE unsigned long
 # define SU(X) ( ((unsigned long long)(X) << 10) >> shift), units
+# define UNIT "%Lu"
 #endif
 
 /* OpenBSD */
 #if HAVE_OPENBSD_SYSCTL
 # define MEM_DATATYPE int
-#define SU(X) ( ((unsigned int)(X) << 10) >> shift), units
+# define SU(X) ( ((unsigned int)(X) << 10) >> shift), units
+# define UNIT "%u"
 #endif
 
 extern MEM_DATATYPE kb_main_used;

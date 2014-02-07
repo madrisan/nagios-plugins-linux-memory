@@ -182,15 +182,17 @@ main (int argc, char **argv)
 
   if (show_memory)
     {
-      printf ("%s %.2f%% (%Lu %s) used | "
-              "mem_total=%Lu%s, mem_used=%Lu%s, mem_free=%Lu%s, "
+      printf ("%s %.2f%% (" UNIT " %s) used | "
+              "mem_total=" UNIT "%s, "
+              "mem_used=" UNIT "%s, "
+              "mem_free=" UNIT "%s, "
 #if HAVE_MEMORY_SHARED
-              "mem_shared=%Lu%s, "
+              "mem_shared=" UNIT "%s, "
 #endif
 #if HAVE_MEMORY_BUFFERS
-              "mem_buffers=%Lu%s, "
+              "mem_buffers=" UNIT "%s, "
 #endif
-              "mem_cached=%Lu%s\n",
+              "mem_cached=" UNIT "%s\n",
               statusbuf, perc, SU (kb_main_used),
               SU (kb_main_total),
               SU (kb_main_used),
@@ -207,8 +209,10 @@ main (int argc, char **argv)
   else
     {
       printf
-        ("%s %.2f%% (%Lu %s) used | "
-         "swap_total=%Lu%s, swap_used=%Lu%s, swap_free=%Lu%s\n",
+        ("%s %.2f%% (" UNIT " %s) used | "
+         "swap_total=" UNIT "%s, "
+         "swap_used=" UNIT "%s, "
+         "swap_free=" UNIT "%s\n",
          statusbuf, perc, SU (kb_swap_used),
          SU (kb_swap_total),
          SU (kb_swap_used),
