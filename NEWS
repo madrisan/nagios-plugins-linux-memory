@@ -3,6 +3,7 @@
 * A new architecture is supported: OpenBSD (tested on v5.0).
 * The plugin has been renamed by removing the '-linux' string.
 * The os-dependent code has been splitted into different files.
+* Enable some extra compiler warnings and fix them all.
 
 ======================================================================
 
