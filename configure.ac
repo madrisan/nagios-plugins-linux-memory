@@ -35,6 +35,27 @@ AC_CACHE_CHECK(
     AC_DEFINE([SUPPORT_ATTRIBUTE_ALIAS], 1, [Define this if the compiler supports the alias attribute])
   fi
 
+dnl Check whether the coòpiler supports the __attribute__((__noreturn__)) feature
+ac_cc_attribute_noreturn=
+ac_save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror"
+AC_CACHE_CHECK(
+  [if compiler supports __attribute__((__noreturn__))],
+  [cc_cv_attribute_noreturn],
+  [AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]],[[
+      void f(void *foo) __attribute__((__noreturn__));]])],
+    [cc_cv_attribute_noreturn=yes],
+    [cc_cv_attribute_noreturn=no])
+  ])
+CFLAGS="$ac_save_CFLAGS"
+if test "x$cc_cv_attribute_noreturn" = "xyes"; then
+  ac_cc_attribute_noreturn='__attribute__((__noreturn__))'
+fi
+AC_DEFINE_UNQUOTED(
+  [__ATTRIBUTE_NORETURN__], [$ac_cc_attribute_noreturn],
+  [Define this if the compiler supports the noreturn attribute])
+
 dnl Checks for header files
 AC_HEADER_STDC
 

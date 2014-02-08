@@ -35,7 +35,7 @@ static const char *program_version = PACKAGE_VERSION;
 static const char *program_copyright =
   "Copyright (C) 2014 Davide Madrisan <" PACKAGE_BUGREPORT ">";
 
-static void __attribute__ ((__noreturn__)) usage (FILE * out)
+static void __ATTRIBUTE_NORETURN__ usage (FILE * out)
 {
   fprintf (out,
            "%s, version %s - check memory usage.\n",
@@ -61,7 +61,7 @@ Examples:\n\
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
 
-static void __attribute__ ((__noreturn__)) print_version (void)
+static void __ATTRIBUTE_NORETURN__ print_version (void)
 {
   printf ("%s, version %s\n", program_name, program_version);
   printf ("%s\n", program_copyright);
