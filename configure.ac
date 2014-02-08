@@ -20,20 +20,24 @@ AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
 
 dnl Check whether the coòpiler supports the __attribute__((weak, alias)) feature
+#ac_save_CFLAGS="$CFLAGS"
+#CFLAGS="$CFLAGS -Werror"
 AC_CACHE_CHECK(
   [if compiler supports __attribute__((weak, alias))],
   [cc_cv_attribute_alias],
   [AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([[]],[[
-      void main_f(void *foo) { }
-      void alias_f(void *foo) __attribute__((weak, alias("main_f")));]])],
+      void __f() { /* do something */; }
+      void f() __attribute__((weak, alias("__f")));]])],
     [cc_cv_attribute_alias=yes],
     [cc_cv_attribute_alias=no])
   ])
-
-  if test "x$cc_cv_attribute_alias" = "xyes"; then
-    AC_DEFINE([SUPPORT_ATTRIBUTE_ALIAS], 1, [Define this if the compiler supports the alias attribute])
-  fi
+#CFLAGS="$ac_save_CFLAGS"
+if test "x$cc_cv_attribute_alias" = "xyes"; then
+  AC_DEFINE(
+    [SUPPORT_ATTRIBUTE_ALIAS], 1,
+    [Define this if the compiler supports the alias attribute])
+fi
 
 dnl Check whether the coòpiler supports the __attribute__((__noreturn__)) feature
 ac_cc_attribute_noreturn=
