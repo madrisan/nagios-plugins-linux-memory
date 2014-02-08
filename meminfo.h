@@ -31,5 +31,6 @@ extern MEM_DATATYPE kb_swap_total;
 extern MEM_DATATYPE kb_swap_free;
 
 void meminfo (void);
+void swapinfo (void);
 
 #endif

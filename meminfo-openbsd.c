@@ -2,7 +2,7 @@
  * License: GPLv2
  * Copyright (c) 2014 Davide Madrisan <davide.madrisan@gmail.com>
  *
- * A Nagios plugin to check memory and swap usage on linux
+ * A Nagios plugin to check memory and swap usage on openbsd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 int get_system_pagesize (void);
 int swapmode (int *, int *);
 void meminfo (void);
+void swapinfo (void);
 
 # define NUM_AVERAGES    3
   /* Log base 2 of 1024 is 10 (2^10 == 1024) */
@@ -52,6 +53,7 @@ int kb_main_used;
 int kb_main_cached;
 int kb_main_free;
 int kb_main_total;
+
 int kb_swap_used;
 int kb_swap_free;
 int kb_swap_total;
@@ -153,6 +155,28 @@ meminfo (void)
   kb_main_used = pagetok (vmtotal.t_arm);
   kb_main_free = pagetok (vmtotal.t_free);;
   kb_main_cached = pagetok (bcstats.numbufpages);
+}
+
+void
+swapinfo (void)
+{
+  static int bcstats_mib[] = { CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT };
+  struct bcachestats bcstats;
+  size_t size;
+
+  if (get_system_pagesize() == -1)
+    { 
+      fputs("RUNTIME ERROR: get_system_pagesize failed\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  size = sizeof (bcstats);
+  if (sysctl (bcstats_mib, 3, &bcstats, &size, NULL, 0) < 0)
+    { 
+      fputs("RUNTIME ERROR: sysctl failed\n", stdout);
+      bzero (&bcstats, sizeof (bcstats));
+      exit(STATE_UNKNOWN);
+    } 
 
   if (!swapmode (&kb_swap_used, &kb_swap_total))
     {

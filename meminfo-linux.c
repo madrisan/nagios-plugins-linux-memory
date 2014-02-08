@@ -33,6 +33,12 @@
 
 void meminfo (void);
 
+#ifdef SUPPORT_ATTRIBUTE_ALIAS
+void swapinfo () __attribute__ ((weak, alias ("meminfo")));
+#else
+# pragma weak swapinfo = meminfo
+#endif
+
 static int meminfo_fd = -1;
 
 /* As of 2.6.24 /proc/meminfo seems to need 888 on 64-bit,

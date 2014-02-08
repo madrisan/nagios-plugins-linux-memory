@@ -19,6 +19,22 @@ dnl Checks for programs
 AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
 
+dnl Check whether the coòpiler supports the __attribute__((weak, alias)) feature
+AC_CACHE_CHECK(
+  [if compiler supports __attribute__((weak, alias))],
+  [cc_cv_attribute_alias],
+  [AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]],[[
+      void main_f(void *foo) { }
+      void alias_f(void *foo) __attribute__((weak, alias("main_f")));]])],
+    [cc_cv_attribute_alias=yes],
+    [cc_cv_attribute_alias=no])
+  ])
+
+  if test "x$cc_cv_attribute_alias" = "xyes"; then
+    AC_DEFINE([SUPPORT_ATTRIBUTE_ALIAS], 1, [Define this if the compiler supports the alias attribute])
+  fi
+
 dnl Checks for header files
 AC_HEADER_STDC
 

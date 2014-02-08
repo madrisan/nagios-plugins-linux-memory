@@ -1,3 +1,11 @@
+
+    Major changes betwhhn "nagios-plugins-memory" version 2 and 3
+
+* The code has been splitted into two different binary programs:
+  check_memory and check_swap.
+
+======================================================================
+
     Major changes betwhhn "nagios-plugins-memory" version 1 and 2
 
 * A new architecture is supported: OpenBSD (tested on v5.0).

@@ -2,7 +2,7 @@
  * License: GPLv2
  * Copyright (c) 2014 Davide Madrisan <davide.madrisan@gmail.com>
  *
- * A Nagios plugin to check memory usage on unix.
+ * A Nagios plugin to check the swap usage on unix.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "nputils.h"
 #include "meminfo.h"
 
-static const char *program_name = "check_memory";
+static const char *program_name = "check_swap";
 static const char *program_version = PACKAGE_VERSION;
 static const char *program_copyright =
   "Copyright (C) 2014 Davide Madrisan <" PACKAGE_BUGREPORT ">";
@@ -38,25 +38,24 @@ static const char *program_copyright =
 static void __attribute__ ((__noreturn__)) usage (FILE * out)
 {
   fprintf (out,
-           "%s, version %s - check memory usage.\n",
+           "%s, version %s - check swap usage.\n",
            program_name, program_version);
   fprintf (out, "%s\n\n", program_copyright);
   fprintf (out,
-           "Usage: %s [-b,-k,-m,-g] [-C] -w PERC -c PERC\n",
+           "Usage: %s [-b,-k,-m,-g] -w PERC -c PERC\n",
            program_name);
   fprintf (out, "       %s -h\n", program_name);
   fprintf (out, "       %s -V\n\n", program_name);
   fputs ("\
 Options:\n\
   -b,-k,-m,-g      show output in bytes, KB (the default), MB, or GB\n\
-  -C, --caches     count buffers and cached memory as free memory\n\
   -w, --warning PERCENT   warning threshold\n\
   -c, --critical PERCENT   critical threshold\n\
   -h, --help       display this help and exit\n\
   -v, --version    output version information and exit\n\n", out);
   fprintf (out, "\
 Examples:\n\
-  %s -C -w 80%% -c90%%\n", program_name);
+  %s -w 30%% -c 50%%\n\n", program_name);
 
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
@@ -74,7 +73,6 @@ There is NO WARRANTY, to the extent permitted by law.\n", stdout);
 }
 
 static struct option const longopts[] = {
-  {(char *) "caches", no_argument, NULL, 'C'},
   {(char *) "critical", required_argument, NULL, 'c'},
   {(char *) "warning", required_argument, NULL, 'w'},
   {(char *) "byte", no_argument, NULL, 'b'},
@@ -90,7 +88,6 @@ int
 main (int argc, char **argv)
 {
   int c, status;
-  int cache_is_free = 0;
   int shift = 10;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
@@ -98,15 +95,12 @@ main (int argc, char **argv)
   thresholds *my_threshold = NULL;
   float perc;
 
-  while ((c = getopt_long (argc, argv, "MSCc:w:bkmghV", longopts, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "c:w:bkmghV", longopts, NULL)) != -1)
     {
       switch (c)
         {
         default:
           usage (stderr);
-          break;
-        case 'C':
-          cache_is_free = 1;
           break;
         case 'c':
           critical = optarg;
@@ -135,20 +129,9 @@ main (int argc, char **argv)
   if (units == NULL)
     units = strdup ("kB");
 
-  meminfo ();
+  swapinfo ();
 
-  if (cache_is_free)
-    {
-#if HAVE_MEMORY_BUFFERS
-      kb_main_used -= (kb_main_cached + kb_main_buffers);
-      kb_main_free += (kb_main_cached + kb_main_buffers);
-#else
-      kb_main_used -= kb_main_cached;
-      kb_main_free += kb_main_cached;
-#endif
-    }
-
-  perc = (kb_main_used * 100.0 / kb_main_total);
+  perc = (kb_swap_used * 100.0 / kb_swap_total);
 
   status = get_status (perc, my_threshold);
   switch (status)
@@ -165,28 +148,13 @@ main (int argc, char **argv)
     }
   free (my_threshold);
 
-  printf ("%s %.2f%% (" UNIT " %s) used | "
-          "mem_total=" UNIT "%s, "
-          "mem_used=" UNIT "%s, "
-          "mem_free=" UNIT "%s, "
-#if HAVE_MEMORY_SHARED
-          "mem_shared=" UNIT "%s, "
-#endif
-#if HAVE_MEMORY_BUFFERS
-          "mem_buffers=" UNIT "%s, "
-#endif
-          "mem_cached=" UNIT "%s\n",
-          statusbuf, perc, SU (kb_main_used),
-          SU (kb_main_total),
-          SU (kb_main_used),
-          SU (kb_main_free),
-#if HAVE_MEMORY_SHARED
-          SU (kb_main_shared),
-#endif
-#if HAVE_MEMORY_BUFFERS
-          SU (kb_main_buffers),
-#endif
-          SU (kb_main_cached));
+  printf
+    ("%s %.2f%% (" UNIT " %s) used | "
+     "swap_total=" UNIT "%s, "
+     "swap_used=" UNIT "%s, "
+     "swap_free=" UNIT "%s\n",
+     statusbuf, perc, SU (kb_swap_used),
+     SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free));
 
   free (units);
 
