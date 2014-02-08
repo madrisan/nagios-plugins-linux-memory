@@ -1,18 +1,21 @@
 # nagios-plugins-linux-memory
 
-A nagios plugin to check memory and swap usage on linux.
+This package contains two nagios plugins for respectivery checking memory and
+swap usage on unix systems.
 
 Usage
 
-	check_memory --memory [-C] [-b,-k,-m,-g] [-w PERC] [-c PERC]
-	check_memory --swap [-b,-k,-m,-g] [-w PERC] [-c PERC]
+	check_memory [-C] [-b,-k,-m,-g] [-w PERC] [-c PERC]
+	check_swap [-b,-k,-m,-g] [-w PERC] [-c PERC]
+	
 	check_memory --help
+	check_swap --help
+	
 	check_memory --version
+	check_swap --version
 
 Where
 
-* -M, --memory: show the memory usage
-* -S, --swap: show the swap usagea
 * -C, --caches: count buffers and cached memory as free memory
 * -b,-k,-m,-g: show output in bytes, KB (the default), MB, or GB
 * -w, --warning PERCENT: warning threshold
@@ -20,8 +23,8 @@ Where
 
 Examples
 
-	check_memory --memory -C -w 80% -c 90%
-	check_memory --swap -w 40% -c 60% -m
+	check_memory -C -w 80% -c 90%
+	check_swap -w 40% -c 60% -m
 
 
 ## Source code
