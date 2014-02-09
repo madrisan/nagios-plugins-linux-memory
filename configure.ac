@@ -104,6 +104,9 @@ dnl Check for some target-specific stuff
 case "$host" in
 
 *-*-linux*)
+  if test -z "$with_procmeminfo"; then
+    AC_MSG_FAILURE([no /proc/meminfo (or equivalent) found])
+  fi
   AC_DEFINE([HAVE_MEMORY_SHARED], [1],
     [Define to 1 if the os has the memory shared counter.])
   AC_DEFINE([HAVE_MEMORY_BUFFERS], [1],
