@@ -111,6 +111,8 @@ case "$host" in
     [Define to 1 if the os has the memory shared counter.])
   AC_DEFINE([HAVE_MEMORY_BUFFERS], [1],
     [Define to 1 if the os has the memory buffers counter.])
+  AC_DEFINE([HAVE_SWAP_PAGES_COUNTER], [1],
+    [Define to 1 if the counter of swapins and swapouts is available.])
   MEMINFO_MODULE='meminfo-linux.$(OBJEXT)'
   ;;
 *-*-openbsd*)

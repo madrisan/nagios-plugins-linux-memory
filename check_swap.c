@@ -153,9 +153,17 @@ main (int argc, char **argv)
     ("%s %.2f%% (" UNIT " %s) used | "
      "swap_total=" UNIT "%s, "
      "swap_used=" UNIT "%s, "
-     "swap_free=" UNIT "%s\n",
+     "swap_free=" UNIT "%s"
+#if HAVE_SWAP_PAGES_COUNTER
+     ", swap_pages_in=%lu, swap_pages_out=%lu"
+#endif
+     "\n",
      statusbuf, percent_used, SU (kb_swap_used),
-     SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free));
+     SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free)
+#if HAVE_SWAP_PAGES_COUNTER
+     , kb_swap_pagesin, kb_swap_pagesout
+#endif
+    );
 
   free (units);
 

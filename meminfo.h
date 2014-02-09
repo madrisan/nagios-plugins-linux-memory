@@ -30,6 +30,9 @@ extern MEM_DATATYPE kb_swap_used;
 extern MEM_DATATYPE kb_swap_total;
 extern MEM_DATATYPE kb_swap_free;
 
+extern unsigned long kb_swap_pagesin;
+extern unsigned long kb_swap_pagesout;
+
 void meminfo (void);
 void swapinfo (void);
 
