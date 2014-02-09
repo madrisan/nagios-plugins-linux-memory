@@ -78,12 +78,32 @@ AC_CHECK_HEADERS([sys/mount.h], [], [],
 #endif
 ]])
 
+AC_ARG_WITH(proc-meminfo,
+  AS_HELP_STRING([--with-proc-meminfo=PATH],
+    [path to /proc/meminfo or equivalent]),
+  []
+  [with_procmeminfo=$withval])
+dnl dunno why this does not work below - use hack (kbd)
+dnl fine on linux, broken on solaris
+dnl if /bin/test -e "/proc/meminfo"
+AC_MSG_CHECKING([for /proc/meminfo])
+if test -n "$with_procmeminfo"; then
+  AC_MSG_RESULT([(command line) $with_procmeminfo])
+elif [cat /proc/meminfo > /dev/null 2>&1]; then
+  AC_MSG_RESULT([found /proc/meminfo])
+  with_procmeminfo="/proc/meminfo"
+else
+  AC_MSG_RESULT([no])
+fi
+if test -n "$with_procmeminfo"; then
+  AC_DEFINE(HAVE_PROC_MEMINFO,1,[Define if we have /proc/meminfo])
+  AC_DEFINE_UNQUOTED(PROC_MEMINFO,"$with_procmeminfo",[path to /proc/meminfo if name changes])
+fi
+
 dnl Check for some target-specific stuff
 case "$host" in
 
 *-*-linux*)
-  AC_DEFINE([HAVE_PROC_MEMINFO], [1],
-    [Define to 1 if you have /proc/meminfo.])
   AC_DEFINE([HAVE_MEMORY_SHARED], [1],
     [Define to 1 if the os has the memory shared counter.])
   AC_DEFINE([HAVE_MEMORY_BUFFERS], [1],

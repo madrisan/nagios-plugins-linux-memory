@@ -3,6 +3,7 @@
 
 * The code has been splitted into two different binary programs:
   check_memory and check_swap.
+* configure: new option '--with-proc-meminfo=PATH'.
 
 ======================================================================
 

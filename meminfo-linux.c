@@ -201,7 +201,7 @@ meminfo (void)
   };
   const int mem_table_count = sizeof (mem_table) / sizeof (mem_table_struct);
 
-  FILE_TO_BUF ("/proc/meminfo", meminfo_fd);
+  FILE_TO_BUF (PROC_MEMINFO, meminfo_fd);
 
   kb_inactive = ~0UL;
 
