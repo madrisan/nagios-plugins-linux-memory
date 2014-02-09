@@ -93,7 +93,7 @@ main (int argc, char **argv)
   char *units = NULL;
   char statusbuf[10];                 /* big enough to hold the plugin status */
   thresholds *my_threshold = NULL;
-  float perc;
+  float percent_used = 0;
 
   while ((c = getopt_long (argc, argv, "c:w:bkmghV", longopts, NULL)) != -1)
     {
@@ -131,9 +131,10 @@ main (int argc, char **argv)
 
   swapinfo ();
 
-  perc = (kb_swap_used * 100.0 / kb_swap_total);
+  if (kb_swap_total != 0)
+    percent_used = (kb_swap_used * 100.0 / kb_swap_total);
 
-  status = get_status (perc, my_threshold);
+  status = get_status (percent_used, my_threshold);
   switch (status)
     {
     case STATE_CRITICAL:
@@ -153,7 +154,7 @@ main (int argc, char **argv)
      "swap_total=" UNIT "%s, "
      "swap_used=" UNIT "%s, "
      "swap_free=" UNIT "%s\n",
-     statusbuf, perc, SU (kb_swap_used),
+     statusbuf, percent_used, SU (kb_swap_used),
      SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free));
 
   free (units);

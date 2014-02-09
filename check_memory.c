@@ -96,7 +96,7 @@ main (int argc, char **argv)
   char *units = NULL;
   char statusbuf[10];                 /* big enough to hold the plugin status */
   thresholds *my_threshold = NULL;
-  float perc;
+  float percent_used = 0;
 
   while ((c = getopt_long (argc, argv, "MSCc:w:bkmghV", longopts, NULL)) != -1)
     {
@@ -148,9 +148,10 @@ main (int argc, char **argv)
 #endif
     }
 
-  perc = (kb_main_used * 100.0 / kb_main_total);
+  if (kb_main_total != 0)
+    percent_used = (kb_main_used * 100.0 / kb_main_total);
 
-  status = get_status (perc, my_threshold);
+  status = get_status (percent_used, my_threshold);
   switch (status)
     {
     case STATE_CRITICAL:
@@ -176,7 +177,7 @@ main (int argc, char **argv)
           "mem_buffers=" UNIT "%s, "
 #endif
           "mem_cached=" UNIT "%s\n",
-          statusbuf, perc, SU (kb_main_used),
+          statusbuf, percent_used, SU (kb_main_used),
           SU (kb_main_total),
           SU (kb_main_used),
           SU (kb_main_free),
