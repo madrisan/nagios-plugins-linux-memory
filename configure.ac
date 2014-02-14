@@ -9,6 +9,7 @@ AC_PREREQ([2.59])
 
 AC_CONFIG_SRCDIR([check_memory.c])
 AC_CONFIG_HEADERS(config.h:config.hin)
+AC_LANG([C])
 
 AM_INIT_AUTOMAKE([gnu dist-bzip2])
 
