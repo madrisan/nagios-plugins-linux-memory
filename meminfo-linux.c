@@ -37,14 +37,6 @@
 
 #define SU(X) ( ((unsigned long long)(X) << 10) >> shift ), units
 
-void vminfo (void);
-void meminfo (int);
-
-char *get_memory_status (int, float, int, const char*);
-char *get_swap_status (int, float, int, const char*);
-char *get_memory_perfdata (int, const char*);
-char *get_swap_perfdata (int, const char*);
-
 #ifdef SUPPORT_ATTRIBUTE_ALIAS
 void swapinfo () __attribute__ ((weak, alias ("meminfo")));
 #else

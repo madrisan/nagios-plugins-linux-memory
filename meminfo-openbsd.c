@@ -34,11 +34,6 @@
 
 #include "nputils.h"
 
-int get_system_pagesize (void);
-int swapmode (int *, int *);
-void meminfo (int);
-void swapinfo (void);
-
 # define NUM_AVERAGES    3
   /* Log base 2 of 1024 is 10 (2^10 == 1024) */
 # define LOG1024         10
