@@ -84,6 +84,8 @@ static struct option const longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
+static char statusbuf[128];     /* big enough to hold the plugin status */
+
 int
 main (int argc, char **argv)
 {
@@ -91,7 +93,6 @@ main (int argc, char **argv)
   int shift = 10;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
-  char statusbuf[10];                 /* big enough to hold the plugin status */
   thresholds *my_threshold = NULL;
   float percent_used = 0;
 
@@ -135,22 +136,13 @@ main (int argc, char **argv)
     percent_used = (kb_swap_used * 100.0 / kb_swap_total);
 
   status = get_status (percent_used, my_threshold);
-  switch (status)
-    {
-    case STATE_CRITICAL:
-      c = sprintf (statusbuf, "CRITICAL:");
-      break;
-    case STATE_WARNING:
-      c = sprintf (statusbuf, "WARNING:");
-      break;
-    case STATE_OK:
-      c = sprintf (statusbuf, "OK:");
-      break;
-    }
   free (my_threshold);
 
+  sprintf (statusbuf, "%s:%.2f%% (" UNIT " %s) used", state_text (status),
+           percent_used, SU (kb_swap_used));
+
   printf
-    ("%s %.2f%% (" UNIT " %s) used | "
+    ("%s | "
      "swap_total=" UNIT "%s, "
      "swap_used=" UNIT "%s, "
      "swap_free=" UNIT "%s"
@@ -158,7 +150,7 @@ main (int argc, char **argv)
      ", swap_pages_in=%lu, swap_pages_out=%lu"
 #endif
      "\n",
-     statusbuf, percent_used, SU (kb_swap_used),
+     statusbuf,
      SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free)
 #if HAVE_SWAP_PAGES_COUNTER
      , kb_swap_pagesin, kb_swap_pagesout

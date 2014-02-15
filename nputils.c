@@ -202,3 +202,21 @@ set_thresholds (thresholds ** my_thresholds, char *warn_string,
 
   return 0;
 }
+
+const char *
+state_text (int result)
+{
+  switch (result)
+    {
+    case STATE_OK:
+      return "OK";
+    case STATE_WARNING:
+      return "WARNING";
+    case STATE_CRITICAL:
+      return "CRITICAL";
+    case STATE_DEPENDENT:
+      return "DEPENDENT";
+    default:
+      return "UNKNOWN";
+    }
+}

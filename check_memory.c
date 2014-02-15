@@ -86,6 +86,8 @@ static struct option const longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
+static char statusbuf[128];     /* big enough to hold the plugin status */
+
 int
 main (int argc, char **argv)
 {
@@ -94,7 +96,6 @@ main (int argc, char **argv)
   int shift = 10;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
-  char statusbuf[10];                 /* big enough to hold the plugin status */
   thresholds *my_threshold = NULL;
   float percent_used = 0;
 
@@ -141,21 +142,12 @@ main (int argc, char **argv)
     percent_used = (kb_main_used * 100.0 / kb_main_total);
 
   status = get_status (percent_used, my_threshold);
-  switch (status)
-    {
-    case STATE_CRITICAL:
-      c = sprintf (statusbuf, "CRITICAL:");
-      break;
-    case STATE_WARNING:
-      c = sprintf (statusbuf, "WARNING:");
-      break;
-    case STATE_OK:
-      c = sprintf (statusbuf, "OK:");
-      break;
-    }
   free (my_threshold);
 
-  printf ("%s %.2f%% (" UNIT " %s) used | "
+  sprintf (statusbuf, "%s:%.2f%% (" UNIT " %s) used", state_text (status),
+           percent_used, SU (kb_main_used));
+
+  printf ("%s | "
           "mem_total=" UNIT "%s, "
           "mem_used=" UNIT "%s, "
           "mem_free=" UNIT "%s, "
@@ -166,7 +158,7 @@ main (int argc, char **argv)
           "mem_buffers=" UNIT "%s, "
 #endif
           "mem_cached=" UNIT "%s\n",
-          statusbuf, percent_used, SU (kb_main_used),
+          statusbuf,
           SU (kb_main_total),
           SU (kb_main_used),
           SU (kb_main_free),

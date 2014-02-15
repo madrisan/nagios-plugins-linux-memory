@@ -1,10 +1,5 @@
 #pragma once
 
-#define STATE_OK        0
-#define STATE_WARNING   1
-#define STATE_CRITICAL  2
-#define STATE_UNKNOWN   3
-
 #ifndef TRUE
 # define TRUE 1
 #endif
@@ -19,6 +14,15 @@
 
 #define OUTSIDE 0
 #define INSIDE  1
+
+enum
+{
+  STATE_OK,
+  STATE_WARNING,
+  STATE_CRITICAL,
+  STATE_UNKNOWN,
+  STATE_DEPENDENT
+};
 
 /* see: nagios-plugins-1.4.15/lib/utils_base.h */
 typedef struct range_struct
@@ -38,3 +42,4 @@ typedef struct thresholds_struct
 
 int get_status (double, thresholds *);
 int set_thresholds (thresholds **, char *, char *);
+const char *state_text (int);
