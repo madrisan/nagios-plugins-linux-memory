@@ -32,7 +32,7 @@
 #include "nputils.h"
 
 void vminfo (void);
-void meminfo (void);
+void meminfo (int);
 
 #ifdef SUPPORT_ATTRIBUTE_ALIAS
 void swapinfo () __attribute__ ((weak, alias ("meminfo")));
@@ -348,7 +348,7 @@ compare_mem_table_structs (const void *a, const void *b)
 }
 
 void
-meminfo (void)
+meminfo (int cache_is_free)
 {
   char namebuf[16];		/* big enough to hold any row name */
   mem_table_struct findme = { namebuf, NULL };
@@ -438,10 +438,16 @@ meminfo (void)
       kb_inactive = kb_inact_dirty + kb_inact_clean + kb_inact_laundry;
     }
 
-  kb_swap_used = kb_swap_total - kb_swap_free;
   kb_main_used = kb_main_total - kb_main_free;
+  if (cache_is_free)
+    {
+      kb_main_used -= (kb_main_cached + kb_main_buffers);
+      kb_main_free += (kb_main_cached + kb_main_buffers);
+    }
 
-  /* get additional statistics */
+  kb_swap_used = kb_swap_total - kb_swap_free;
+
+  /* get additional statistics for swap */
 
   FILE_TO_BUF (PROC_STAT, stat_fd);
 

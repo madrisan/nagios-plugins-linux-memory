@@ -36,7 +36,7 @@
 
 int get_system_pagesize (void);
 int swapmode (int *, int *);
-void meminfo (void);
+void meminfo (int);
 void swapinfo (void);
 
 # define NUM_AVERAGES    3
@@ -120,7 +120,7 @@ swapmode (int *used, int *total)
 }
 
 void
-meminfo (void)
+meminfo (int cache_is_free)
 {
   static int vmtotal_mib[] = { CTL_VM, VM_METER };
   static int bcstats_mib[] = { CTL_VFS, VFS_GENERIC, VFS_BCACHESTAT };
@@ -155,6 +155,12 @@ meminfo (void)
   kb_main_used = pagetok (vmtotal.t_arm);
   kb_main_free = pagetok (vmtotal.t_free);;
   kb_main_cached = pagetok (bcstats.numbufpages);
+
+  if (cache_is_free)
+    {
+      kb_main_used -= kb_main_cached;
+      kb_main_free += kb_main_cached;
+    }
 }
 
 void

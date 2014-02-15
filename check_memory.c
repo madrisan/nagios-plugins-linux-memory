@@ -135,18 +135,7 @@ main (int argc, char **argv)
   if (units == NULL)
     units = strdup ("kB");
 
-  meminfo ();
-
-  if (cache_is_free)
-    {
-#if HAVE_MEMORY_BUFFERS
-      kb_main_used -= (kb_main_cached + kb_main_buffers);
-      kb_main_free += (kb_main_cached + kb_main_buffers);
-#else
-      kb_main_used -= kb_main_cached;
-      kb_main_free += kb_main_cached;
-#endif
-    }
+  meminfo (cache_is_free);
 
   if (kb_main_total != 0)
     percent_used = (kb_main_used * 100.0 / kb_main_total);
