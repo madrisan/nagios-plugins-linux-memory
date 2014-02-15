@@ -84,8 +84,6 @@ static struct option const longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-static char statusbuf[128];     /* big enough to hold the plugin status */
-
 int
 main (int argc, char **argv)
 {
@@ -93,6 +91,8 @@ main (int argc, char **argv)
   int shift = 10;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
+  char *status_msg;
+  char *perfdata_msg;
   thresholds *my_threshold = NULL;
   float percent_used = 0;
 
@@ -138,26 +138,14 @@ main (int argc, char **argv)
   status = get_status (percent_used, my_threshold);
   free (my_threshold);
 
-  sprintf (statusbuf, "%s:%.2f%% (" UNIT " %s) used", state_text (status),
-           percent_used, SU (kb_swap_used));
+  status_msg = get_swap_status (status, percent_used, shift, units);
+  perfdata_msg = get_swap_perfdata (shift, units);
 
-  printf
-    ("%s | "
-     "swap_total=" UNIT "%s, "
-     "swap_used=" UNIT "%s, "
-     "swap_free=" UNIT "%s"
-#if HAVE_SWAP_PAGES_COUNTER
-     ", swap_pages_in=%lu, swap_pages_out=%lu"
-#endif
-     "\n",
-     statusbuf,
-     SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free)
-#if HAVE_SWAP_PAGES_COUNTER
-     , kb_swap_pagesin, kb_swap_pagesout
-#endif
-    );
+  printf ("%s | %s\n", status_msg, perfdata_msg);
 
   free (units);
+  free (status_msg);
+  free (perfdata_msg);
 
   return status;
 }

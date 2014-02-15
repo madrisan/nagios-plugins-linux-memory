@@ -79,6 +79,9 @@ AC_CHECK_HEADERS([sys/mount.h], [], [],
 #endif
 ]])
 
+AC_CHECK_FUNCS([ \
+  asprintf])
+
 AC_ARG_WITH(proc-meminfo,
   AS_HELP_STRING([--with-proc-meminfo=PATH],
     [path to /proc/meminfo or equivalent]),
@@ -108,12 +111,7 @@ case "$host" in
   if test -z "$with_procmeminfo"; then
     AC_MSG_FAILURE([no /proc/meminfo (or equivalent) found])
   fi
-  AC_DEFINE([HAVE_MEMORY_SHARED], [1],
-    [Define to 1 if the os has the memory shared counter.])
-  AC_DEFINE([HAVE_MEMORY_BUFFERS], [1],
-    [Define to 1 if the os has the memory buffers counter.])
-  AC_DEFINE([HAVE_SWAP_PAGES_COUNTER], [1],
-    [Define to 1 if the counter of swapins and swapouts is available.])
+  AC_DEFINE_UNQUOTED(MEM_DATATYPE,[unsigned long],[The C data type of the memory variables])
   MEMINFO_MODULE='meminfo-linux.$(OBJEXT)'
   ;;
 *-*-openbsd*)
@@ -177,6 +175,7 @@ AC_MSG_RESULT([$ac_cv_function_sysctl_vfs_bcachestat])
       AC_DEFINE([HAVE_OPENBSD_SYSCTL], [1],
        [Define to 1 if you have all the required OpenBSD sysctl calls.])
   fi
+  AC_DEFINE_UNQUOTED(MEM_DATATYPE,[int],[The C data type of the memory variables])
   MEMINFO_MODULE='meminfo-openbsd.$(OBJEXT)'
   ;;
 *)

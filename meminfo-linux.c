@@ -22,6 +22,10 @@
 
 #include "config.h"
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE /* activate extra prototypes for glibc */
+#endif
+
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -31,8 +35,15 @@
 
 #include "nputils.h"
 
+#define SU(X) ( ((unsigned long long)(X) << 10) >> shift ), units
+
 void vminfo (void);
 void meminfo (int);
+
+char *get_memory_status (int, float, int, const char*);
+char *get_swap_status (int, float, int, const char*);
+char *get_memory_perfdata (int, const char*);
+char *get_swap_perfdata (int, const char*);
 
 #ifdef SUPPORT_ATTRIBUTE_ALIAS
 void swapinfo () __attribute__ ((weak, alias ("meminfo")));
@@ -475,4 +486,95 @@ meminfo (int cache_is_free)
       kb_swap_pagesin = vm_pswpin;
       kb_swap_pagesout = vm_pswpout;
     }
+}
+
+char *
+get_memory_status (int status, float percent_used, int shift,
+                   const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg, "%s: %.2f%% (%lu kB) used", state_text (status),
+                  percent_used, kb_main_used);
+
+  if (ret < 0)
+    {
+      fputs("Error getting memory status\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+  
+  return msg;
+}
+
+char *
+get_swap_status (int status, float percent_used, int shift,
+                 const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg, "%s: %.2f%% (%lu kB) used", state_text (status),
+                  percent_used, kb_swap_used);
+
+  if (ret < 0)
+    {
+      fputs("Error getting swap status\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  return msg;
+}
+
+char *
+get_memory_perfdata (int shift, const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg,
+                  "mem_total=%Lu%s, "
+                  "mem_used=%Lu%s, "
+                  "mem_free=%Lu%s, "
+                  "mem_shared=%Lu%s, "
+                  "mem_buffers=%Lu%s, "
+                  "mem_cached=%Lu%s\n",
+                  SU (kb_main_total),
+                  SU (kb_main_used),
+                  SU (kb_main_free),
+                  SU (kb_main_shared),
+                  SU (kb_main_buffers), SU (kb_main_cached));
+
+  if (ret < 0)
+    {
+      fputs("Error getting memory perfdata\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  return msg;
+}
+
+char *
+get_swap_perfdata (int shift, const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg,
+                  "swap_total=%Lu%s, "
+                  "swap_used=%Lu%s, "
+                  "swap_free=%Lu%s, "
+                  "swap_pages_in=%lu, swap_pages_out=%lu\n",
+                  SU (kb_swap_total),
+                  SU (kb_swap_used),
+                  SU (kb_swap_free),
+                  kb_swap_pagesin, kb_swap_pagesout);
+
+  if (ret < 0)
+    {
+      fputs("Error getting swap perfdata\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  return msg;
 }

@@ -86,8 +86,6 @@ static struct option const longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-static char statusbuf[128];     /* big enough to hold the plugin status */
-
 int
 main (int argc, char **argv)
 {
@@ -96,6 +94,8 @@ main (int argc, char **argv)
   int shift = 10;
   char *critical = NULL, *warning = NULL;
   char *units = NULL;
+  char *status_msg;
+  char *perfdata_msg;
   thresholds *my_threshold = NULL;
   float percent_used = 0;
 
@@ -144,33 +144,14 @@ main (int argc, char **argv)
   status = get_status (percent_used, my_threshold);
   free (my_threshold);
 
-  sprintf (statusbuf, "%s:%.2f%% (" UNIT " %s) used", state_text (status),
-           percent_used, SU (kb_main_used));
+  status_msg = get_memory_status (status, percent_used, shift, units);
+  perfdata_msg = get_memory_perfdata (shift, units);
 
-  printf ("%s | "
-          "mem_total=" UNIT "%s, "
-          "mem_used=" UNIT "%s, "
-          "mem_free=" UNIT "%s, "
-#if HAVE_MEMORY_SHARED
-          "mem_shared=" UNIT "%s, "
-#endif
-#if HAVE_MEMORY_BUFFERS
-          "mem_buffers=" UNIT "%s, "
-#endif
-          "mem_cached=" UNIT "%s\n",
-          statusbuf,
-          SU (kb_main_total),
-          SU (kb_main_used),
-          SU (kb_main_free),
-#if HAVE_MEMORY_SHARED
-          SU (kb_main_shared),
-#endif
-#if HAVE_MEMORY_BUFFERS
-          SU (kb_main_buffers),
-#endif
-          SU (kb_main_cached));
+  printf ("%s | %s\n", status_msg, perfdata_msg);
 
   free (units);
+  free (status_msg);
+  free (perfdata_msg);
 
   return status;
 }
