@@ -22,6 +22,10 @@
 
 #include "config.h"
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE /* activate extra prototypes for glibc */
+#endif
+
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/mount.h>
@@ -33,6 +37,8 @@
 #include <string.h>
 
 #include "nputils.h"
+
+#define SU(X) ( ((unsigned int)(X) << 10) >> shift ), units
 
 # define NUM_AVERAGES    3
   /* Log base 2 of 1024 is 10 (2^10 == 1024) */
@@ -185,4 +191,90 @@ swapinfo (void)
       kb_swap_used = 0;
     }
   kb_swap_free = kb_swap_total - kb_swap_used;
+}
+
+char *
+get_memory_status (int status, float percent_used, int shift,
+                   const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg, "%s: %.2f%% (%d kB) used", state_text (status),
+                  percent_used, kb_main_used);
+
+  if (ret < 0)
+    {
+      fputs("Error getting memory status\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+  
+  return msg;
+}
+
+char *
+get_swap_status (int status, float percent_used, int shift,
+                 const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg, "%s: %.2f%% (%d kB) used", state_text (status),
+                  percent_used, kb_swap_used);
+
+  if (ret < 0)
+    {
+      fputs("Error getting swap status\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  return msg;
+}
+
+char *
+get_memory_perfdata (int shift, const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg,
+                  "mem_total=%d%s, "
+                  "mem_used=%d%s, "
+                  "mem_free=%d%s, "
+                  "mem_cached=%d%s\n",
+                  SU (kb_main_total),
+                  SU (kb_main_used),
+                  SU (kb_main_free),
+                  SU (kb_main_cached));
+
+  if (ret < 0)
+    {
+      fputs("Error getting memory perfdata\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  return msg;
+}
+
+char *
+get_swap_perfdata (int shift, const char *units)
+{
+  char *msg;
+  int ret;
+
+  ret = asprintf (&msg,
+                  "swap_total=%d%s, "
+                  "swap_used=%d%s, "
+                  "swap_free=%d%s\n",
+                  SU (kb_swap_total),
+                  SU (kb_swap_used),
+                  SU (kb_swap_free));
+
+  if (ret < 0)
+    {
+      fputs("Error getting swap perfdata\n", stdout);
+      exit(STATE_UNKNOWN);
+    }
+
+  return msg;
 }
