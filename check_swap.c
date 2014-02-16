@@ -35,7 +35,7 @@ static const char *program_version = PACKAGE_VERSION;
 static const char *program_copyright =
   "Copyright (C) 2014 Davide Madrisan <" PACKAGE_BUGREPORT ">";
 
-static void __ATTRIBUTE_NORETURN__ usage (FILE * out)
+static void attribute_noreturn usage (FILE * out)
 {
   fprintf (out,
            "%s, version %s - check swap usage.\n",
@@ -60,7 +60,7 @@ Examples:\n\
   exit (out == stderr ? STATE_UNKNOWN : STATE_OK);
 }
 
-static void __ATTRIBUTE_NORETURN__ print_version (void)
+static void attribute_noreturn print_version (void)
 {
   printf ("%s, version %s\n", program_name, program_version);
   printf ("%s\n", program_copyright);

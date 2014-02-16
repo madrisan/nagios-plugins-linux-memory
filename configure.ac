@@ -20,7 +20,7 @@ dnl Checks for programs
 AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
 
-dnl Check whether the coòpiler supports the __attribute__((weak, alias)) feature
+dnl Check whether the compiler supports the __attribute__((weak, alias)) feature
 #ac_save_CFLAGS="$CFLAGS"
 #CFLAGS="$CFLAGS -Werror"
 AC_CACHE_CHECK(
@@ -40,7 +40,7 @@ if test "x$cc_cv_attribute_alias" = "xyes"; then
     [Define this if the compiler supports the alias attribute])
 fi
 
-dnl Check whether the coòpiler supports the __attribute__((__noreturn__)) feature
+dnl Check whether the compiler supports the __attribute__((__noreturn__)) feature
 ac_cc_attribute_noreturn=
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -Werror"
@@ -58,8 +58,31 @@ if test "x$cc_cv_attribute_noreturn" = "xyes"; then
   ac_cc_attribute_noreturn='__attribute__((__noreturn__))'
 fi
 AC_DEFINE_UNQUOTED(
-  [__ATTRIBUTE_NORETURN__], [$ac_cc_attribute_noreturn],
+  [attribute_noreturn], [$ac_cc_attribute_noreturn],
   [Define this if the compiler supports the noreturn attribute])
+
+dnl Check whether the compiler supports the 
+dnl    __attribute__((__format__ (__printf__, x,y))) feature
+ac_cc_attribute_format_printf=
+ac_save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror"
+AC_CACHE_CHECK(
+  [if compiler supports __attribute__((__format__ (__printf__, x,y))],
+  [cc_cv_attribute_format_printf],
+  [AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]],[[
+      void f(const char *fmt, ...)
+         __attribute__((__format__ (__printf__, 1,2)));]])],
+    [cc_cv_attribute_format_printf=yes],
+    [cc_cv_attribute_format_printf=no])
+  ])
+CFLAGS="$ac_save_CFLAGS"
+if test "x$cc_cv_attribute_format_printf" = "xyes"; then
+  ac_cc_attribute_format_printf='__attribute__((__format__ (__printf__, X,Y)))'
+fi
+AC_DEFINE_UNQUOTED(
+  [attribute_format_printf(X,Y)], [$ac_cc_attribute_format_printf],
+  [Define this if the compiler supports the format printf attribute])
 
 dnl Checks for header files
 AC_HEADER_STDC
