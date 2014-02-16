@@ -43,3 +43,7 @@ typedef struct thresholds_struct
 int get_status (double, thresholds *);
 int set_thresholds (thresholds **, char *, char *);
 const char *state_text (int);
+void die (int, const char *, ...)
+        __ATTRIBUTE_NORETURN__
+        __attribute__ ((__format__ (__printf__, 2, 3)));
+

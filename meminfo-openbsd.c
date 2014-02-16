@@ -130,25 +130,20 @@ meminfo (int cache_is_free)
   size_t size;
 
   if (get_system_pagesize() == -1)
-    { 
-      fputs("RUNTIME ERROR: get_system_pagesize failed\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "RUNTIME ERROR: get_system_pagesize failed\n");
 
   /* get total -- systemwide main memory usage structure */
   size = sizeof (vmtotal);
   if (sysctl (vmtotal_mib, 2, &vmtotal, &size, NULL, 0) < 0)
     { 
       bzero (&vmtotal, sizeof (vmtotal));
-      fputs("RUNTIME ERROR: sysctl failed\n", stdout);
-      exit(STATE_UNKNOWN);
+      die (STATE_UNKNOWN, "RUNTIME ERROR: sysctl failed\n");
     } 
   size = sizeof (bcstats);
   if (sysctl (bcstats_mib, 3, &bcstats, &size, NULL, 0) < 0)
     { 
-      fputs("RUNTIME ERROR: sysctl failed\n", stdout);
       bzero (&bcstats, sizeof (bcstats));
-      exit(STATE_UNKNOWN);
+      die (STATE_UNKNOWN, "RUNTIME ERROR: sysctl failed\n");
     } 
 
   /* convert memory stats to Kbytes */
@@ -172,17 +167,13 @@ swapinfo (void)
   size_t size;
 
   if (get_system_pagesize() == -1)
-    { 
-      fputs("RUNTIME ERROR: get_system_pagesize failed\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "RUNTIME ERROR: get_system_pagesize failed\n");
 
   size = sizeof (bcstats);
   if (sysctl (bcstats_mib, 3, &bcstats, &size, NULL, 0) < 0)
     { 
-      fputs("RUNTIME ERROR: sysctl failed\n", stdout);
       bzero (&bcstats, sizeof (bcstats));
-      exit(STATE_UNKNOWN);
+      die (STATE_UNKNOWN, "RUNTIME ERROR: sysctl failed\n");
     } 
 
   if (!swapmode (&kb_swap_used, &kb_swap_total))
@@ -204,10 +195,7 @@ get_memory_status (int status, float percent_used, int shift,
                   percent_used, kb_main_used);
 
   if (ret < 0)
-    {
-      fputs("Error getting memory status\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting memory status\n");
   
   return msg;
 }
@@ -223,10 +211,7 @@ get_swap_status (int status, float percent_used, int shift,
                   percent_used, kb_swap_used);
 
   if (ret < 0)
-    {
-      fputs("Error getting swap status\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting swap status\n");
 
   return msg;
 }
@@ -248,10 +233,7 @@ get_memory_perfdata (int shift, const char *units)
                   SU (kb_main_cached));
 
   if (ret < 0)
-    {
-      fputs("Error getting memory perfdata\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting memory perfdata\n");
 
   return msg;
 }
@@ -271,10 +253,7 @@ get_swap_perfdata (int shift, const char *units)
                   SU (kb_swap_free));
 
   if (ret < 0)
-    {
-      fputs("Error getting swap perfdata\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting swap perfdata\n");
 
   return msg;
 }

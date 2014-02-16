@@ -487,10 +487,7 @@ get_memory_status (int status, float percent_used, int shift,
                   percent_used, kb_main_used);
 
   if (ret < 0)
-    {
-      fputs("Error getting memory status\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting memory status\n");
   
   return msg;
 }
@@ -506,10 +503,7 @@ get_swap_status (int status, float percent_used, int shift,
                   percent_used, kb_swap_used);
 
   if (ret < 0)
-    {
-      fputs("Error getting swap status\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting swap status\n");
 
   return msg;
 }
@@ -530,10 +524,7 @@ get_memory_perfdata (int shift, const char *units)
                   SU (kb_pagingin), SU (kb_pagingout));
 
   if (ret < 0)
-    {
-      fputs("Error getting memory perfdata\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting memory perfdata\n");
 
   return msg;
 }
@@ -554,10 +545,7 @@ get_swap_perfdata (int shift, const char *units)
                   SU (kb_swap_pagesin), SU (kb_swap_pagesout));
 
   if (ret < 0)
-    {
-      fputs("Error getting swap perfdata\n", stdout);
-      exit(STATE_UNKNOWN);
-    }
+    die (STATE_UNKNOWN, "Error getting swap perfdata\n");
 
   return msg;
 }

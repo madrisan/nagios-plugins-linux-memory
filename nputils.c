@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -214,4 +215,15 @@ state_text (int result)
     default:
       return "UNKNOWN";
     }
+}
+
+void
+die (int result, const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  vprintf (fmt, ap);
+  va_end (ap);
+
+  exit (result);
 }
