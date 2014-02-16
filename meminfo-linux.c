@@ -218,10 +218,8 @@ unsigned long kb_swap_pagesin;
 unsigned long kb_swap_pagesout;
 
 /* Number of pageins and pageouts (since the last boot) */
-/*
 unsigned long kb_pagingin;
 unsigned long kb_pagingout;
- */
 
 void
 vminfo (void)
@@ -450,17 +448,15 @@ meminfo (int cache_is_free)
 
   kb_swap_used = kb_swap_total - kb_swap_free;
 
-  /* get additional statistics for swap */
+  /* get additional statistics for memory and swap activity */
 
   FILE_TO_BUF (PROC_STAT, stat_fd);
 
-/*
   b = strstr(buf, "page ");
   if(b)
     sscanf(b, "page %lu %lu", &kb_pagingin, &kb_pagingout);
   else
     need_vmstat_file = 1;
- */
 
   b = strstr(buf, "swap ");
   if(b)
@@ -471,10 +467,10 @@ meminfo (int cache_is_free)
   if (need_vmstat_file)  /* Linux 2.5.40-bk4 and above */
     {
       vminfo();
-/*
+
       kb_pagingin  = vm_pgpgin;
       kb_pagingout = vm_pgpgout;
-*/
+
       kb_swap_pagesin = vm_pswpin;
       kb_swap_pagesout = vm_pswpout;
     }
@@ -525,17 +521,13 @@ get_memory_perfdata (int shift, const char *units)
   int ret;
 
   ret = asprintf (&msg,
-                  "mem_total=%Lu%s, "
-                  "mem_used=%Lu%s, "
-                  "mem_free=%Lu%s, "
-                  "mem_shared=%Lu%s, "
-                  "mem_buffers=%Lu%s, "
-                  "mem_cached=%Lu%s\n",
-                  SU (kb_main_total),
-                  SU (kb_main_used),
-                  SU (kb_main_free),
-                  SU (kb_main_shared),
-                  SU (kb_main_buffers), SU (kb_main_cached));
+                  "mem_total=%Lu%s, mem_used=%Lu%s, mem_free=%Lu%s, "
+                  "mem_shared=%Lu%s, mem_buffers=%Lu%s, mem_cached=%Lu%s, "
+                  "pagingin=%Lu%s, pagingout=%Lu%s\n",
+                  SU (kb_main_total), SU (kb_main_used), SU (kb_main_free),
+                  SU (kb_main_shared), SU (kb_main_buffers),
+                  SU (kb_main_cached),
+                  SU (kb_pagingin), SU (kb_pagingout));
 
   if (ret < 0)
     {
@@ -553,14 +545,13 @@ get_swap_perfdata (int shift, const char *units)
   int ret;
 
   ret = asprintf (&msg,
-                  "swap_total=%Lu%s, "
-                  "swap_used=%Lu%s, "
-                  "swap_free=%Lu%s, "
-                  "swap_pages_in=%lu, swap_pages_out=%lu\n",
-                  SU (kb_swap_total),
-                  SU (kb_swap_used),
-                  SU (kb_swap_free),
-                  kb_swap_pagesin, kb_swap_pagesout);
+                  "swap_total=%Lu%s, swap_used=%Lu%s, swap_free=%Lu%s, "
+                  /* The amount of swap, in kB, used as cache memory */
+                  "swap_cached=%Lu%s, "
+                  "swap_pages_in=%Lu%s, swap_pages_out=%Lu%s\n",
+                  SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free),
+                  SU (kb_swap_cached),
+                  SU (kb_swap_pagesin), SU (kb_swap_pagesout));
 
   if (ret < 0)
     {

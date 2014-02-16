@@ -4,8 +4,13 @@
 * The code has been splitted into two different binary programs:
   check_memory and check_swap.
 * configure: new option '--with-proc-meminfo=PATH'.
-* check_swap: display on linux the number of swapins and swapouts
-  (since the last boot).
+* check_swap: display on linux the number of swapins and swapouts,
+  in kilobytes (since the last boot), and the amount of swap used as
+  cache memory.
+* check_memory: display also on linux 'pagingin' and 'pagingout'
+  values.
+* These plugins can now be compiled by the 'clang' compiler without
+  any warning message.
 
 ======================================================================
 
