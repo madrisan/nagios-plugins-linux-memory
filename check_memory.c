@@ -105,7 +105,6 @@ main (int argc, char **argv)
         {
         default:
           usage (stderr);
-          break;
         case 'C':
           cache_is_free = 1;
           break;
@@ -117,10 +116,8 @@ main (int argc, char **argv)
           break;
         case 'h':
           usage (stdout);
-          break;
         case 'V':
           print_version ();
-          break;
         case 'b': shift = 0;  units = strdup ("B"); break;
         case 'k': shift = 10; units = strdup ("kB"); break;
         case 'm': shift = 20; units = strdup ("MB"); break;
