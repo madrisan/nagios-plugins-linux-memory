@@ -78,7 +78,7 @@ and run on
 * Linux with kernel 2.6.18 (RHEL 5.X (Tikanga))
 * OpenBSD 5.0
 
-Thanks to grex.org for providing a free OpenBSD shell account.
+My special thanks to grex.org team for giving me a free OpenBSD shell account.
 
 
 ## Bugs
