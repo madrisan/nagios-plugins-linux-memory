@@ -30,7 +30,9 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 #include <sys/sysctl.h>
-#include <sys/swap.h>
+#if HAVE_SYS_SWAP_H
+# include <sys/swap.h>
+#endif
 #include <unistd.h>    /* getpagesize */
 #include <stdio.h>
 #include <stdlib.h>

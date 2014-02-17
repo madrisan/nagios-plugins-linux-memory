@@ -88,15 +88,10 @@ dnl Checks for header files
 AC_HEADER_STDC
 
 AC_CHECK_HEADERS([sys/param.h])
-# check sys/sysctl.h separately, as it requires other header
-# on at least OpenBSD 
-AC_CHECK_HEADERS([sys/sysctl.h], [], [],
-[[#if HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-]])
 
-AC_CHECK_HEADERS([sys/mount.h], [], [],
+# check some header files separately, as they require other header
+# on at least OpenBSD
+AC_CHECK_HEADERS([sys/sysctl.h sys/mount.h sys/swap.h], [], [],
 [[#if HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
