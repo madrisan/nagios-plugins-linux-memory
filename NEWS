@@ -7,8 +7,7 @@
 * check_swap: display on linux the number of swapins and swapouts,
   in kilobytes (since the last boot), and the amount of swap used as
   cache memory.
-* check_memory: display also on linux 'pagingin' and 'pagingout'
-  values.
+* check_memory: add on linux 'mem_pageins' and 'mem_pageouts'.
 * These plugins can now be compiled by the 'clang' compiler without
   any warning message.
 

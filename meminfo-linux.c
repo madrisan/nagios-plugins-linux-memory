@@ -213,13 +213,13 @@ static unsigned long vm_nr_unstable;
 static unsigned long vm_pginodesteal;
 static unsigned long vm_slabs_scanned;
 
-/* Number of swapins and swapout (since the last boot):*/
-unsigned long kb_swap_pagesin;
-unsigned long kb_swap_pagesout;
+/* Number of swapins and swapouts (since the last boot):*/
+unsigned long kb_swap_pageins;
+unsigned long kb_swap_pageouts;
 
 /* Number of pageins and pageouts (since the last boot) */
-unsigned long kb_pagingin;
-unsigned long kb_pagingout;
+unsigned long kb_mem_pageins;
+unsigned long kb_mem_pageouts;
 
 void
 vminfo (void)
@@ -454,13 +454,13 @@ meminfo (int cache_is_free)
 
   b = strstr(buf, "page ");
   if(b)
-    sscanf(b, "page %lu %lu", &kb_pagingin, &kb_pagingout);
+    sscanf(b, "page %lu %lu", &kb_mem_pageins, &kb_mem_pageouts);
   else
     need_vmstat_file = 1;
 
   b = strstr(buf, "swap ");
   if(b)
-    sscanf(b, "swap %lu %lu", &kb_swap_pagesin, &kb_swap_pagesout);
+    sscanf(b, "swap %lu %lu", &kb_swap_pageins, &kb_swap_pageouts);
   else
     need_vmstat_file = 1;
 
@@ -468,11 +468,11 @@ meminfo (int cache_is_free)
     {
       vminfo();
 
-      kb_pagingin  = vm_pgpgin;
-      kb_pagingout = vm_pgpgout;
+      kb_mem_pageins  = vm_pgpgin;
+      kb_mem_pageouts = vm_pgpgout;
 
-      kb_swap_pagesin = vm_pswpin;
-      kb_swap_pagesout = vm_pswpout;
+      kb_swap_pageins = vm_pswpin;
+      kb_swap_pageouts = vm_pswpout;
     }
 }
 
@@ -517,11 +517,11 @@ get_memory_perfdata (int shift, const char *units)
   ret = asprintf (&msg,
                   "mem_total=%Lu%s, mem_used=%Lu%s, mem_free=%Lu%s, "
                   "mem_shared=%Lu%s, mem_buffers=%Lu%s, mem_cached=%Lu%s, "
-                  "pagingin=%Lu%s, pagingout=%Lu%s\n",
+                  "mem_pageins=%Lu%s, mem_pageouts=%Lu%s\n",
                   SU (kb_main_total), SU (kb_main_used), SU (kb_main_free),
                   SU (kb_main_shared), SU (kb_main_buffers),
                   SU (kb_main_cached),
-                  SU (kb_pagingin), SU (kb_pagingout));
+                  SU (kb_mem_pageins), SU (kb_mem_pageouts));
 
   if (ret < 0)
     die (STATE_UNKNOWN, "Error getting memory perfdata\n");
@@ -539,10 +539,10 @@ get_swap_perfdata (int shift, const char *units)
                   "swap_total=%Lu%s, swap_used=%Lu%s, swap_free=%Lu%s, "
                   /* The amount of swap, in kB, used as cache memory */
                   "swap_cached=%Lu%s, "
-                  "swap_pages_in=%Lu%s, swap_pages_out=%Lu%s\n",
+                  "swap_pageins=%Lu%s, swap_pageouts=%Lu%s\n",
                   SU (kb_swap_total), SU (kb_swap_used), SU (kb_swap_free),
                   SU (kb_swap_cached),
-                  SU (kb_swap_pagesin), SU (kb_swap_pagesout));
+                  SU (kb_swap_pageins), SU (kb_swap_pageouts));
 
   if (ret < 0)
     die (STATE_UNKNOWN, "Error getting swap perfdata\n");
