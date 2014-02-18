@@ -8,12 +8,6 @@ extern MEM_DATATYPE kb_main_total;
 extern MEM_DATATYPE kb_swap_used;
 extern MEM_DATATYPE kb_swap_total;
 
-/* OpenBSD */
-#if HAVE_OPENBSD_SYSCTL
-# define SU(X) ( ((unsigned int)(X) << 10) >> shift), units
-# define UNIT "%u"
-#endif
-
 void meminfo (int);
 void swapinfo (void);
 
